@@ -1,0 +1,102 @@
+---
+title: "Who Opts For Cesarean Deliveries : Delving Deep Into The C-Section Trends"
+author: "Haritha Biju"
+format: html
+editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+![](UNICEF-Logo.png)
+
+# *Introduction*
+
+The experience of childbirth represents a pivotal and life-changing event for women and their families across the globe. However, the method by which babies are delivered has undergone significant changes over time, with an increasing number of women now electing to undergo cesarean sections (C-sections) as opposed to vaginal delivery. The reasons behind this shift in delivery method may vary and can include a range of factors, such as maternal preference, concerns over potential complications associated with vaginal delivery, or medical indications that may necessitate a C-section. Nevertheless, it is important to understand the implications of this trend, particularly with regard to the potential health outcomes for both mother and infant. While C-section delivery can be a life-saving procedure in certain situations, it also carries its own set of risks and potential complications. Thus, a comprehensive examination of the impacts of C-section delivery versus vaginal delivery is necessary to ensure that women are equipped with the information necessary to make informed decisions about their childbirth options.
+
+```{r}
+library(tidyverse)
+library(maps)
+library(ggplot2)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(readr)
+library(tibble)
+
+unicef_data <- read.csv("unicef_indicator_2.csv")
+unicef_csection_data <- select(unicef_data, country, year = time_period, c_section_rate = obs_value)
+
+data_by_country <- group_by(unicef_data, country)
+
+average_rate_by_country <- summarise(data_by_country, average_countrywise_rate = mean(obs_value))
+
+data_by_year <- group_by(unicef_data , time_period)
+
+average_rate_by_year <- summarise(data_by_year, average_yearwise_rate = mean(obs_value))
+
+map_world <- map_data("world") 
+average_rate_by_country_map <- full_join(map_world, average_rate_by_country, by = c("region" = "country"))
+
+
+ggplot(data = average_rate_by_country_map) +
+  aes(x = long, y = lat, group = group, fill = average_countrywise_rate) +
+  geom_polygon() +
+  scale_fill_gradient(low = "yellow", high = "red", na.value = "grey") +
+  labs(
+    title = "Percentage of People Opting For C-Section Around The World",
+    subtitle = "Countries in grey have no data available in the database",
+    caption = "Source: UNICEF Database",
+    x = "Longitude",
+    y = "Latitude",
+    fill = "C-Section Rate"
+  ) +
+  theme_classic()
+```
+While C-sections can be life-saving in certain situations, they are also major surgeries that come with potential risks and complications. Cesarean sections, or C-sections, have become increasingly common around the world, with rates rising in many countries over the past few decades. 
+
+
+# *Trend Analysis*
+```{r}
+
+ggplot(average_rate_by_year) +
+  aes(x = time_period, y = average_yearwise_rate) +
+  geom_point(aes(color = average_yearwise_rate)) +
+  geom_smooth(method = "lm") +
+  labs(x = "Year (2000 to 2021)",
+    y = "C-Section Rate",
+    title = "The Cesarean Revolution: Global Trends in C-Section Rate") +
+  theme_classic()
+
+```
+In order to ascertain the potential health benefits of cesarean section delivery, it is imperative to examine and analyze the health outcomes across a span of time, specifically between the years 2000-2021. It is important to note, however, that while cesarean delivery may play a role in maternal and neonatal health, it is also possible that there are other factors that contribute to these health outcomes. As such, a comprehensive examination of the available data is necessary to determine the overall impact of cesarean section delivery on maternal and neonatal health during the aforementioned time period.
+
+# *Maternal and Infant Mortality Rates*
+```{r}
+mortality_data <- read.csv("Avg. Infant Mortality 2000-2021.csv")
+
+ggplot(data = mortality_data) +
+  aes(x = Year, y = Avg..Infant.Mortality, fill = Avg..Infant.Mortality) +
+  geom_col()+
+    labs(x = "Year (2000 to 2021)",
+    y = "Infant Mortality Rate",
+    title = "Saving Lives: How Maternal and Infant Mortality Rates Have Declined") +
+  theme_bw()
+  
+ggplot(data = mortality_data) +
+  aes(x = Year, y = Avg..Maternal.Mortality.Ratio, colour = Avg..Maternal.Mortality.Ratio) +
+  geom_line()+
+    labs(x = "Year (2000 to 2021)",
+    y = "Maternal Mortality Rate") +
+  theme_bw()
+    
+```
+
+
+
+The present analysis reveals a significant decrease in maternal and infant mortality rates. This underscores the importance of providing optimal care for women during the transformative and life-changing experience of childbirth. The health and well-being of mothers and infants are of paramount concern, and every effort must be made to ensure that they receive the highest quality care. The findings of this analysis call for continued efforts by healthcare providers and policymakers to prioritize maternal and infant health and to implement evidence-based strategies aimed at improving maternal and neonatal outcomes. Ultimately, by investing in maternal and infant health, we can improve the quality of life for families and communities and ensure that every woman receives the care she deserves during this critical time.
+
+
+
+
+
